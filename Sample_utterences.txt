@@ -1,0 +1,2 @@
+GetHelpIntent {info}
+DefaultIntent {info}
