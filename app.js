@@ -1,5 +1,6 @@
 'use strict';
 var Alexa = require('alexa-sdk');
+var http = require('https');
 
 var APP_ID = undefined; //OPTIONAL: replace with "amzn1.echo-sdk-ams.app.[your-unique-value-here]";
 var SKILL_NAME = 'Health Me';
@@ -23,7 +24,24 @@ var handlers = {
 	},
 	'GetFact': function () {
 		var response = this.event.request.intent.slots.info.value;
-		this.emit(':tell', response)	
+		var self = this;
+
+		http.get('https://health-me.herokuapp.com/resolvehook?msg=' + response, function (res) {
+				res.setEncoding('utf8');
+
+				var noaaResponseString = '';
+				res.on('data', function (data) {
+					noaaResponseString += data;
+					});
+
+				res.on('end', function () {
+
+					self.emit(':tell', 'You got it. ' + noaaResponseString + 'Also,.... just wanted to tell you..... you are awesome');
+					//this.context.done(null, '');
+					});
+				}).on('error', function (e) {
+					console.log(':tell', e.message);
+					});
 	},
 	'AMAZON.HelpIntent': function () {
 		var speechOutput = "You can say tell me a health related question, or, you can say exit... What can I help you with?";
@@ -37,3 +55,4 @@ var handlers = {
 		this.emit(':tell', 'Goodbye!');
 	}
 };
+
