@@ -28,7 +28,9 @@ var handlers = {
 
 		http.get('https://health-me.herokuapp.com/resolvehook?msg=' + response, function (res) {
 				res.setEncoding('utf8');
-
+				if (res.statusCode != 200) {
+				self.emit(':tell', 'I apologize but I do not understand your question. Could you please repeat? Ask me a health or nutrition question')
+				}
 				var noaaResponseString = '';
 				res.on('data', function (data) {
 					noaaResponseString += data;
@@ -36,10 +38,11 @@ var handlers = {
 
 				res.on('end', function () {
 
-					self.emit(':tell', 'You got it. ' + noaaResponseString + 'Also,.... just wanted to tell you..... you are awesome');
+					self.emit(':tell', 'You got it. ' + noaaResponseString + '. Thank you for asking!');
 					//this.context.done(null, '');
 					});
 				}).on('error', function (e) {
+					self.emit(':tell', 'I apologize but I do not understand your question. Could you please repeat? Ask me a health or nutrition question')
 					console.log(':tell', e.message);
 					});
 	},
